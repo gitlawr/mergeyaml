@@ -18,21 +18,22 @@ var (
 func init() {
 
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stdout, "Usage:\n%s <formerYamlFile> <latterFile>", os.Args[0])
+		fmt.Fprintf(os.Stdout, "Usage:\n%s <formerYamlFile> <latterFile>\n", os.Args[0])
 		flag.PrintDefaults()
 	}
-	// parse flags
 
-	args := os.Args
-	if len(args) != 3 {
-		flag.Usage()
-		os.Exit(0)
-	}
-	formerFile = os.Args[1]
-	latterFile = os.Args[2]
+	// parse flags
 	flag.StringVar(&outputFile, "output", "merge_output.yml", "output file")
 	flag.StringVar(&outputFile, "o", "merge_output.yml", "output file (shorthand)")
 	flag.Parse()
+
+	args := flag.Args()
+	if len(args) != 2 {
+		flag.Usage()
+		os.Exit(0)
+	}
+	formerFile = args[0]
+	latterFile = args[1]
 }
 
 func main() {

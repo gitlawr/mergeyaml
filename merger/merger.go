@@ -21,8 +21,16 @@ func MergeYaml(yml1 []byte, yml2 []byte) ([]byte, error) {
 		fmt.Printf("get error:%v", err)
 		return nil, err
 	}
-	res := MergeMap(obj1.(map[interface{}]interface{}), obj2.(map[interface{}]interface{}))
-	fmt.Printf("get map:%v", res)
+
+	var res interface{}
+	if obj1 == nil {
+		res = obj2
+	} else if obj2 == nil {
+		res = obj1
+	} else {
+		res = MergeMap(obj1.(map[interface{}]interface{}), obj2.(map[interface{}]interface{}))
+	}
+	//fmt.Printf("get map:%v", res)
 	out, err := yaml.Marshal(res)
 	if err != nil {
 		return nil, err
@@ -40,16 +48,18 @@ func MergeMap(first map[interface{}]interface{}, second map[interface{}]interfac
 	}
 
 	for k, v := range first {
-		fmt.Printf("first type:%v", reflect.TypeOf(first[k]))
-		fmt.Printf("second type:%v", reflect.TypeOf(second[k]))
+		//fmt.Printf("first type:%v", reflect.TypeOf(first[k]))
+		//fmt.Printf("second type:%v", reflect.TypeOf(second[k]))
 		if reflect.TypeOf(second[k]) != reflect.TypeOf(first[k]) {
 			second[k] = v
+			//fmt.Printf("v:%v\n", v)
 		} else if reflect.TypeOf(first[k]) == reflect.TypeOf(map[interface{}]interface{}{}) {
 			//merge maps
 			second[k] = MergeMap(first[k].(map[interface{}]interface{}), second[k].(map[interface{}]interface{}))
-		} else if reflect.TypeOf(first[k]) == reflect.TypeOf([]interface{}{}) {
+		} else {
 			//for other types,replace it with value in first map.
 			second[k] = v
+			//fmt.Printf("cover,v:%v\n", v)
 		}
 	}
 
